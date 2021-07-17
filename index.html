@@ -1,4 +1,122 @@
 <html>
-  <head></html>
-  <body>Hello World.</body>
+  <head>
+    <title>Tetris</title>
+    <style>
+      #piecekeeper {
+        border: 1px solid gray;
+        background-color: #aaaaaa;
+        margin-right: 5px;
+      }
+      #playfield {
+        border: 1px solid gray;
+        position: static;
+      }
+      #preview {
+        border: 1px solid gray;
+        background-color: #EEEEEE;
+        margin-left: 5px;
+        margin-bottom: 10px;
+      }
+      #restart {
+        margin: 5px;
+      }
+      #score {
+        border: 1px solid gray;
+        width: 120px;
+        margin-left: 5px;
+        float: left;
+        font-size: large;
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+        text-align: right;
+      }
+      #legend {
+        margin: 5px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: small;
+      }
+      .table {
+        display: table;
+/*        border: 1px dashed green; */
+      }
+      .row {
+        display: table-row;
+/*        border: 1px dashed green; */
+        vertical-align: top;
+      }
+      .cell {
+        display: table-cell;
+/*        border: 1px dashed green; */
+        vertical-align: top;
+      }
+      #status {
+        position: fixed;
+        top: 100;
+        left: 100;
+        font-size: 36px;
+        text-shadow: darkgray 0px 0px 10px;
+        color: black;
+        /*
+        color: green;
+        display: none;
+        background-color: red;
+        padding: 5px;
+        border: 3px solid black;
+        */
+      }
+    </style>
+  </head>
+  <body>
+      <div id="status"></div>
+      <div class="table">
+        <div class="row">
+          <div class="cell">
+            <canvas id="piecekeeper" width=60 height=60></canvas>
+          </div>
+          <div class="cell">
+            <canvas id="playfield" width=200 height=400></canvas>
+          </div>
+          <div class="cell">
+            <div class="table">
+              <div class="row">
+                <div class="cell">
+                  <canvas id="preview" width="60" height="60""></canvas>
+                  <!--
+                  <canvas id="preview" width="80" height="80"></canvas>
+                  -->
+                </div>
+              </div>
+              <div class="row">
+                <div class="cell">
+                  <span id="score"></span>
+                </div>    
+              </div>
+              <div class="row">
+                <div class="cell">
+                  <button id="restart" onclick="start()">Restart</button><div id="debug"></div>
+                </div>    
+              </div>
+              <div class="row">
+                <div class="cell">
+                  <div id="legend" >
+                    &lt; ....... left <br>
+                    &gt; ....... right <br>
+                    ^ ....... rotate <br>
+                    v ....... down <br>
+                    SPACE ... drop <br>
+                    ESC ..... pause <br>  
+                    R ....... restart <br>
+                    B ....... switch piece <br>
+                  </div>
+                </div>    
+              </div>
+            </div>
+          </div>
+        </div>  
+      </div>
+    <script src="tetris.js"></script>
+    <script>
+      start()
+    </script>
+  </body>
 </html>
