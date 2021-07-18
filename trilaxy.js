@@ -175,9 +175,9 @@ function draw() {
   trilaxy.animate()
   trilaxy.draw()
 
-  ctx.font = "30px Arial";
+  ctx.font = "40px Arial";
   ctx.fillStyle = 'white'
-  ctx.fillText("Trilaxy Software", center.x - 100, center.y );
+  ctx.fillText("Trilaxy Software", center.x - 150, center.y );
 
   if( animationTimer ) {
     clearTimeout( animationTimer )
