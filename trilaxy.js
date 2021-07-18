@@ -157,7 +157,7 @@ function startAnimation() {
 function draw() {
 
   ctx.fillStyle = background
-  ctx.globalAlpha = .5
+  ctx.globalAlpha = .8
   ctx.fillRect( 0, 0, canvas.width, canvas.height )
 
   // dot( center.x, center.y, 10, 'white' )
@@ -175,9 +175,10 @@ function draw() {
   trilaxy.animate()
   trilaxy.draw()
 
-  ctx.font = "40px Arial";
+  ctx.globalAlpha = 1
+  ctx.font = "30px Arial";
   ctx.fillStyle = 'white'
-  ctx.fillText("Trilaxy Software", center.x - 150, center.y );
+  ctx.fillText("Trilaxy Software", center.x - 100, center.y );
 
   if( animationTimer ) {
     clearTimeout( animationTimer )
