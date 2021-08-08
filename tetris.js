@@ -44,35 +44,40 @@ class Piece {
   }
   
   draw() {
-    let block = game.blocksize
-    game.ctx.fillStyle = this.color
-    for( let i = 0; i < this.shape.length; i++ ) {
-      let c = this.letter2coordinates( this.shape[ i ] );
-      game.ctx.fillRect( ( this.x + c.x ) * block, 
-        ( this.y + c.y ) * block, block, block )
-    }
+    this.drawImpl( game.ctx, game.blocksize, this.x, this.y )
   }
   
   drawPreview() {
-    let block = game.previewBlocksize
-    game.ctxPreview.fillStyle = this.color
-    for( let i = 0; i < this.shape.length; i++ ) {
-      let c = this.letter2coordinates( this.shape[ i ] );
-      game.ctxPreview.fillRect( c.x * block, 
-        c.y * block, block, block )
-    }
+    this.drawImpl( game.ctxPreview, game.previewBlocksize, 0, 0 )
   }
 
   drawPieceKeeper() {
-    let block = game.keeperBlocksize
-    game.ctxPieceKeeper.fillStyle = this.color
+    this.drawImpl( game.ctxPieceKeeper, game.keeperBlocksize, 0, 0 )
+  }
+
+  drawImpl( ctx, blocksize, x, y ) {
+    ctx.fillStyle = this.color
     for( let i = 0; i < this.shape.length; i++ ) {
       let c = this.letter2coordinates( this.shape[ i ] );
-      game.ctxPieceKeeper.fillRect( c.x * block, 
-        c.y * block, block, block )
+      ctx.fillRect( ( x + c.x ) * blocksize, 
+        ( y + c.y ) * blocksize, blocksize, blocksize )
     }
   }
 
+  /**
+   * @returns Duplicate copy of piece
+   */
+  duplicate() {
+    return this.move( 0, 9 )
+  }
+
+  /**
+   * Create new piece which is x,y blocks removed from original
+   * 
+   * @param {*} x Move by x horizontally
+   * @param {*} y Move by y vertically
+   * @returns 
+   */
   move( x, y ) {
 
     // game.sound1.start()
@@ -203,6 +208,11 @@ class Playfield {
         }
       }
     }
+    game.ctx.strokeStyle = 'red'
+    game.ctx.beginPath()
+    game.ctx.moveTo( 0, 4 * game.blocksize )
+    game.ctx.lineTo( game.playFieldWidth * game.blocksize, 4 * game.blocksize )
+    game.ctx.stroke()
   }
 
   toString() {
@@ -221,7 +231,7 @@ class Playfield {
 }
 
 function drawAll() {
-  game.score.innerHTML = game.scoreCount
+  game.score.innerHTML = "Score: " + game.scoreCount
   game.ctx.fillStyle = 'white'
   game.ctx.fillRect( 0, 0, game.canvas.width, game.canvas.height )
   game.piece.draw()  
@@ -263,7 +273,18 @@ function move() {
       drawAll()
       game.piece.makeSediment()
       game.playfield.explodeFullLines()
-      addPiece()
+
+      if( game.piece.y < 4 ) {
+        drawAll()
+        game.over = true
+        game.status.innerHTML = "Game Over<br>Score:" + game.scoreCount 
+        game.restart.style.display = "block"
+    
+      }
+      else {
+        addPiece()
+      }
+
     }
 
 }
@@ -388,13 +409,31 @@ function keypress( ev ) {
 function makeRandomPiece() {
   let r = Math.floor( Math.random() * pieces.length )
   let piece = pieces[ r ]
-  piece = piece.move( Math.floor( Math.random() * 9 ), 0 )
+  piece = piece.rotate( Math.floor( Math.random() * 4 ) )
+  let position = Math.floor( Math.random() * game.playFieldWidth )
+  piece = moveToXPosition( piece, position )
   //game.debug.innerHTML = piece.x + "/" + piece.right
   while( piece.x + piece.right > 9 ) {
     piece = piece.move( -1, 0 )
   }
-  piece = piece.rotate( Math.floor( Math.random() * 4 ) )
   return piece
+}
+
+/**
+ * Calculate the moves (- left or + right) to move the piece to
+ * the given position. Also do not move the piece out of the right
+ * side of the playfield.
+ * 
+ */
+function moveToXPosition( piece, position ) {
+
+  let moves = position - ( piece.x + piece.left )
+  if( piece.x + piece.right + moves >= game.playFieldWidth ) {
+    let outsideOfField = ( piece.x + piece.right + moves ) - ( game.playFieldWidth - 1 )
+    moves -= outsideOfField  
+  }
+  return piece.move( moves, 0 )
+
 }
 
 function addPiece() {
@@ -404,19 +443,12 @@ function addPiece() {
     game.speed *= 0.7
     game.factor++
   }
+  game.level.innerHTML = "Level: " + game.factor
   //game.debug.innerHTML = game.pieceCount + " / " + game.speed + " / " + game.factor
   game.piece = game.nextPiece
-  if( game.piece.collision() ) {
-    drawAll()
-    game.over = true
-    game.status.innerHTML = "Game Over<br>Score:" + game.scoreCount 
-    game.restart.style.display = "block"
-  }
-  else {
-    drawAll()
-    game.nextPiece = makeRandomPiece()
-    drawPreview()
-  }
+  drawAll()
+  game.nextPiece = makeRandomPiece()
+  drawPreview()
 }
 
 /*
@@ -437,9 +469,16 @@ let pieces = [
 
 let game = {}
 
+function init() {
+  game = {}
+  game.playFieldWidth = 10
+  game.playFieldHeight = 24
+}
+
 function start() {
 
-  game = {}
+  init()
+
   game.pause = false
   game.over = false
   game.status = ""
@@ -447,8 +486,6 @@ function start() {
   game.pieceCount = 0
   game.factor = 1
   game.speed = 1000
-  game.playFieldWidth = 10
-  game.playFieldHeight = 20
 
   game.audio = new AudioContext()  
   game.sound1 = game.audio.createOscillator()
@@ -463,6 +500,7 @@ function start() {
   game.debug = document.querySelector( '#debug' )
   game.status = document.querySelector( '#status' )
   game.score = document.querySelector( '#score' )
+  game.level = document.querySelector( '#level' )
   game.restart = document.querySelector( '#restart' )
   game.preview = document.querySelector( '#preview' )
   game.pieceKeeper  = document.querySelector( '#piecekeeper' )

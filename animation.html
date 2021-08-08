@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Animation</title>
+  </head>
+  <body>
+    <canvas></canvas>
+    <script src="animation.js"></script>
+    <script>
+      let canvas = document.querySelector( "canvas" )
+      let animation = new Animation( canvas )
+      animation.backgroundColor = 'black'
+      animation.setAutoMaximize( true )
+      for( let i = 0; i < 300; i++ ) {
+        animation.add( 
+          new Ball( canvas, 
+            canvas.width / 2, // x
+            3 + Math.random() * 10, // y 
+            10 + Math.random() * 20, // r
+            Math.random() * 10, // side speed
+            Math.random() * 0.4, // initial fall speed
+            randomColor() ) )
+      }
+      animation.start()
+    </script>
+  </body>
+</html>

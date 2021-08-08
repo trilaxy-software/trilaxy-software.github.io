@@ -30,6 +30,16 @@
         font-family: 'Courier New', Courier, monospace;
         text-align: right;
       }
+      #level {
+        border: 1px solid gray;
+        width: 120px;
+        margin-left: 5px;
+        float: left;
+        font-size: large;
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+        text-align: right;
+      }
       #legend {
         margin: 5px;
         font-family: 'Courier New', Courier, monospace;
@@ -74,7 +84,7 @@
             <canvas id="piecekeeper" width=60 height=60></canvas>
           </div>
           <div class="cell">
-            <canvas id="playfield" width=200 height=400></canvas>
+            <canvas id="playfield" width=200 height=480></canvas>
           </div>
           <div class="cell">
             <div class="table">
@@ -89,6 +99,11 @@
               <div class="row">
                 <div class="cell">
                   <span id="score"></span>
+                </div>    
+              </div>
+              <div class="row">
+                <div class="cell">
+                  <span id="level"></span>
                 </div>    
               </div>
               <div class="row">

@@ -3,18 +3,12 @@
 // configuration
 let speed = 10
 let starCount = 300
+let novafreq = 0.99998
+let burstlen = 25
 let background = 'black'
 
 // internals
 let canvas = document.querySelector( "#trilaxy" )
-let ctx = canvas.getContext( '2d' )
-let finished = false
-//let story = 0
-
-let waitForResize
-let animationTimer
-let center = {}
-let trilaxy
 
 // classes --------------------------------------
 
@@ -22,7 +16,9 @@ class Trilaxy {
 
   distance = 0
 
-  constructor( x, y, size ) {
+  constructor( canvas, x, y, size ) {
+    this.canvas = canvas
+    this.ctx = canvas.getContext( '2d' )
     this.x = x
     this.y = y
     this.size = size
@@ -48,6 +44,10 @@ class Trilaxy {
     for( let i = 0; i < this.galaxies.length; i++ ) {
       this.galaxies[ i ].draw()
     } 
+    this.ctx.globalAlpha = 1
+    this.ctx.font = "30px Arial";
+    this.ctx.fillStyle = 'white'
+    this.ctx.fillText("Trilaxy Software", this.canvas.width / 2 - 100, canvas.height / 2 );
   }
 
 }
@@ -90,7 +90,7 @@ class Galaxy {
   }
 
   draw() {
-    dot( this.x, this.y, this.size / 30, this.color )
+    dot( this.trilaxy.ctx, this.x, this.y, this.size / 30, this.color )
     for( let i = 0; i < this.stars.length; i++ ) {
       let star = this.stars[ i ]
       star.draw()
@@ -103,6 +103,7 @@ class Star {
 
   constructor( galaxy, size, color, radPosition, distance, radSpeed, distanceSpeed ) {
     this.galaxy = galaxy
+    this.ctx = this.galaxy.trilaxy.ctx
     this.size = size
     this.color = color
     this.radPosition = radPosition
@@ -119,89 +120,39 @@ class Star {
     }
   }
 
+  getX() {
+    return this.galaxy.x + Math.sin( this.radPosition ) * this.distance
+  }
+
+  getY() {
+    return this.galaxy.y + Math.cos( this.radPosition ) * this.distance
+  }
+
   draw() {
-    let x = Math.sin( this.radPosition ) * this.distance
-    let y = Math.cos( this.radPosition ) * this.distance
-    dot( this.galaxy.x + x, this.galaxy.y + y, this.size, this.color )
+    let x = this.getX()
+    let y = this.getY()
+    dot( this.ctx, x, y, this.size, this.color )
   }
 
+  
 }
 
-window.onresize = runDelayed
-
-function runDelayed() {
-
-  if( waitForResize ) {
-    clearTimeout( waitForResize )
-    waitForResize = null
-  }
-
-  resizeCanvas()
-  waitForResize = setTimeout( startAnimation, 500 )
-
-}
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  center.x = canvas.width / 2
-  center.y = canvas.height / 2
-}
-
-function startAnimation() {
-  resizeCanvas()
-  trilaxy = new Trilaxy( center.x, center.y, Math.min( canvas.height, canvas.width ) / 4 )
-  draw()
-}
-
-function draw() {
-
-  ctx.fillStyle = background
-  ctx.globalAlpha = .8
-  ctx.fillRect( 0, 0, canvas.width, canvas.height )
-
-  // dot( center.x, center.y, 10, 'white' )
-
-  // story += .1
-  // if( story > Math.PI * 2 ) {
-  //   story = 0
-  // }
-
-  // dot( 
-  //   center.x + Math.sin( story ) * 30, 
-  //   center.y + Math.cos( story ) * 30, 
-  //   3, 'red' )
-
-  trilaxy.animate()
-  trilaxy.draw()
-
-  ctx.globalAlpha = 1
-  ctx.font = "30px Arial";
-  ctx.fillStyle = 'white'
-  ctx.fillText("Trilaxy Software", center.x - 100, center.y );
-
-  if( animationTimer ) {
-    clearTimeout( animationTimer )
-    animationTimer = null
-  }
-
-  animationTimer = setTimeout( () => {
-    requestAnimationFrame( draw )
-  }, speed )
-
-}
-
-function dot( x, y, r, color ) {
-
+function dot( ctx, x, y, r, color ) {
   ctx.fillStyle = color
   ctx.beginPath()
   ctx.arc( x, y, r, 0, Math.PI * 2 )
   ctx.closePath()
   ctx.fill()
-
 }
 
-startAnimation()
+
+let animation = new Animation( canvas )
+animation.backgroundColor = background
+animation.maximize()
+trilaxy = new Trilaxy( canvas, canvas.width / 2, canvas.height / 2, Math.min( canvas.height, canvas.width ) / 4 )
+animation.add( trilaxy )
+animation.start()
+
 
 
 
